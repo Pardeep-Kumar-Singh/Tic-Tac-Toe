@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tic Tac Toe</title>
+    <style>
+        body {
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background: linear-gradient(to bottom right, #3498db, #2ecc71);
+            font-family: 'Arial', sans-serif;
+            overflow: hidden;
+        }
+
+        #game-container {
+            max-width: 300px;
+            width: 100%;
+        }
+        #game-container h2{
+            font-size: 40px;
+            text-align: center;
+            color: #fff;
+            text-decoration-line: underline;
+        }
+
+        #game-board {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .cell {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 80px;
+            background: #fff;
+            border: 2px solid #3498db;
+            border-radius: 5px;
+            color: #797979;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.9s;
+        }
+        .cell:hover{
+            background-color: #ffffff96;
+        }
+
+        #reset-button {
+            display: block;
+            margin: 20px auto;
+            padding: 10px 20px;
+            background: #2ecc71;
+            color: #fff;
+            border-radius: 15px;
+            border: 1px solid wheat;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.9s;
+        }
+        #reset-button:hover{
+            transform: scale(0.9);
+        }
+
+        #winner-popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #fff;
+            padding: 20px;
+            text-align: center;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+            z-index: 999;
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <h2>Tic-Tac-Toe</h2>
+        <div id="game-board"></div>
+        <button id="reset-button">Reset Game</button>
+        <div id="winner-popup"></div>
+    </div>
+
+    <script>
+        const board = document.getElementById('game-board');
+        const resetButton = document.getElementById('reset-button');
+        const winnerPopup = document.getElementById('winner-popup');
+
+        let currentPlayer = 'X';
+        let boardState = ['', '', '', '', '', '', '', '', ''];
+        let gameActive = true;
+
+        function handleCellClick(index) {
+            if (boardState[index] === '' && gameActive) {
+                boardState[index] = currentPlayer;
+                renderBoard();
+                checkWinner();
+                togglePlayer();
+            }
+        }
+
+        function renderBoard() {
+            board.innerHTML = '';
+            boardState.forEach((value, index) => {
+                const cell = document.createElement('div');
+                cell.classList.add('cell');
+                cell.textContent = value;
+                cell.addEventListener('click', () => handleCellClick(index));
+                board.appendChild(cell);
+            });
+        }
+
+        function togglePlayer() {
+            currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+        }
+
+        function checkWinner() {
+            const winPatterns = [
+                [0, 1, 2], [3, 4, 5], [6, 7, 8],
+                [0, 3, 6], [1, 4, 7], [2, 5, 8],
+                [0, 4, 8], [2, 4, 6]
+            ];
+
+            for (const pattern of winPatterns) {
+                const [a, b, c] = pattern;
+                if (boardState[a] && boardState[a] === boardState[b] && boardState[a] === boardState[c]) {
+                    gameActive = false;
+                    showWinnerPopup(boardState[a]);
+                    return;
+                }
+            }
+
+            if (!boardState.includes('')) {
+                gameActive = false;
+                showWinnerPopup('Draw');
+            }
+        }
+
+        function showWinnerPopup(winner) {
+            winnerPopup.textContent = winner === 'Draw' ? 'It\'s a Draw!' : `Player ${winner} wins!`;
+            winnerPopup.style.display = 'block';
+        }
+
+        function resetGame() {
+            boardState = ['', '', '', '', '', '', '', '', ''];
+            currentPlayer = 'X';
+            gameActive = true;
+            winnerPopup.style.display = 'none';
+            renderBoard();
+        }
+
+        resetButton.addEventListener('click', resetGame);
+
+        // Initial render
+        renderBoard();
+    </script>
+</body>
+</html>
